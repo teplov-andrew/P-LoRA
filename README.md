@@ -30,10 +30,15 @@
 | `beta_dynamics/center_5_5_one_shot/` | Center | one-shot |
 | `base_dreambooth/` | DreamBooth | — |
 
-### Общий код и утилиты
+### Дополнительный код
 
 | Путь | Содержимое |
 |---|---|
 | `src/metrics.py` |  `reconstruction_score`, `editability_score` |
 | `utils/visual.py` | `make_grid_with_caption` и `make_training_progress_grid` для построения сеток изображений |
 | `data/test_prompts.py` | `live_set`, `object_set`, `base_prompt` |
+
+`train.sh` - общее обучение (просто как шаблон)  
+`generate_samples.py` - параллельная генерация изображений по чекпоинтам на нескольких GPU. Основной файл для создания генераций  
+`distributions_papers.ipynb` - основной файл, где общие графики editability/reconstruction score по всем конфигурациям и режимам  
+`Images.ipynb` - сборка дополнительных визуализаций  
