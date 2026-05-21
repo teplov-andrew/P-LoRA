@@ -28,9 +28,6 @@ def parse_args():
 
 def main():
     args = parse_args()
-    # Bump the NCCL barrier timeout: ranks may finish at very different times
-    # because checkpoints split round-robin can be uneven, and SDXL inference
-    # is slow.
     pg_kwargs = InitProcessGroupKwargs(timeout=timedelta(hours=2))
     accelerator = Accelerator(kwargs_handlers=[pg_kwargs])
     rank = accelerator.process_index
@@ -38,9 +35,6 @@ def main():
     device = accelerator.device
 
     exp_dir = Path(args.exp_dir).resolve()
-
-    # Make data.test_prompts importable from the project root
-    # (one level above the experiment dir).
     project_root = exp_dir.parent
     sys.path.insert(0, str(project_root))
     from importlib import import_module
@@ -66,9 +60,6 @@ def main():
 
         sample_dir.mkdir(parents=True, exist_ok=True)
 
-        # Resume support: figure out which (prompt, sample_idx) outputs are
-        # missing on disk before touching the GPU. If everything already exists,
-        # skip the SDXL load entirely (saves ~10 s per checkpoint).
         todo = []
         for pd in prompts:
             for i in range(args.n_gen):
@@ -81,17 +72,10 @@ def main():
                   f"{len(prompts) * args.n_gen} samples already on disk, skip",
                   flush=True)
             continue
-
-        # Re-create pipeline per checkpoint (matches the notebook; avoids any
-        # LoRA-merge edge cases). SDXL weights come from the HF cache after
-        # the first download, so this is just ~10 s of disk I/O per step.
         pipe = StableDiffusionXLPipeline.from_pretrained(
             args.model_id, torch_dtype=torch.float16
         ).to(device)
         pipe.load_lora_weights(str(ckpt_path), weight=1.0)
-        # Suppress the per-call 30-step diffusion bar — with hundreds of
-        # samples per checkpoint it floods stdout. Outer tqdm below shows
-        # overall progress instead.
         pipe.set_progress_bar_config(disable=True)
         print(f"[rank {rank}] step {step}: LoRA loaded, generating "
               f"{len(todo)} of {len(prompts) * args.n_gen} samples "
@@ -112,15 +96,10 @@ def main():
             ).images[0]
             img.save(str(out))
 
-        # Free GPU memory before the next checkpoint.
         del pipe
         torch.cuda.empty_cache()
 
         print(f"[rank {rank}] step {step}: done", flush=True)
-
-    # No global barrier here on purpose: ranks have unequal workloads
-    # (round-robin slice), and waiting for stragglers just risks hitting
-    # the NCCL timeout. Each rank exits independently.
     print(f"[rank {rank}] all assigned steps done", flush=True)
 
 
