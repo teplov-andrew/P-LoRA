@@ -1,0 +1,31 @@
+{
+  "name": "ImageEdit (P-LoRA, SDXL)",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": [
+    "--name=arteplov_imageedit",
+    "--gpus=all",
+    "--shm-size=16g",
+    "--ipc=host"
+  ],
+  "mounts": [
+    "source=imageedit-hf-cache,target=/root/.cache/huggingface,type=volume",
+    "source=${localWorkspaceFolder}/../data_train,target=/workspaces/data_train,type=bind,readonly"
+  ],
+  "containerEnv": {
+    "HF_HOME": "/root/.cache/huggingface",
+    "TRANSFORMERS_CACHE": "/root/.cache/huggingface/hub"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-renderers"
+      ]
+    }
+  },
+  "workspaceFolder": "/workspaces/ImageEdit"
+}

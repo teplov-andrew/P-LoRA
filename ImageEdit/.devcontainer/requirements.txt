@@ -1,0 +1,45 @@
+# Pinned to match the original conda environment used in the paper
+# (ImageEdit/requirements.txt), but cleaned of conda-only @ file:// entries.
+# diffusers and openai/CLIP are installed from git in the Dockerfile.
+
+# ---- Core ML stack (CUDA 12.4) ----
+torch==2.6.0
+torchvision==0.21.0+cu124
+triton==3.2.0
+xformers==0.0.29.post3
+
+# ---- HuggingFace + LoRA ----
+# diffusers (from git, see Dockerfile) requires peft>=0.17, which in turn
+# imports `EmbeddingParallel` from transformers.integrations.tensor_parallel.
+# That class was added in transformers 4.55+, so we have to keep both fresh.
+accelerate==1.10.1
+transformers>=4.55
+peft>=0.17
+safetensors==0.6.2
+huggingface_hub==0.35.1
+hf-xet==1.1.10
+
+# ---- Numerical / image ----
+numpy==2.2.6
+pillow==11.3.0
+tqdm==4.67.1
+einops
+
+# ---- Notebooks + viz (distributions_papers.ipynb, dynamic_metrics.ipynb) ----
+ipykernel
+jupyter
+matplotlib
+seaborn
+pandas
+
+# ---- Training logs (loss curves via diffusers' --report_to=tensorboard) ----
+# Without this package accelerate silently skips logging and <output_dir>/logs
+# is never created. Required for the Beta-P-LoRA variance-tracking experiment.
+tensorboard
+
+# ---- RMBG-1.4 trust_remote_code dependency ----
+scikit-image
+
+# ---- ftfy / regex are required by openai/CLIP at import time ----
+ftfy
+regex

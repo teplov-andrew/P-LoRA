@@ -1,0 +1,22 @@
+accelerate launch --num_processes=1 mult_1_dynamic/train_dreambooth_lora_sdxl.py \
+--pretrained_model_name_or_path="stabilityai/stable-diffusion-xl-base-1.0" \
+--pretrained_vae_model_name_or_path="madebyollin/sdxl-vae-fp16-fix" \
+--instance_data_dir="/workspaces/data_train" \
+--class_data_dir="./dataset/few_shot/class_images" \
+--instance_prompt="a photo of a sks dog" \
+--class_prompt="a photo of a dog" \
+--output_dir="mult_1_dynamic" \
+--resolution=1024 \
+--train_batch_size=1 \
+--gradient_accumulation_steps=1 \
+--learning_rate=1e-4 \
+--lr_scheduler="constant" \
+--lr_warmup_steps=0 \
+--max_train_steps=1000 \
+--checkpointing_steps=100 \
+--mixed_precision="fp16" \
+--enable_xformers_memory_efficient_attention \
+--gradient_checkpointing \
+--with_prior_preservation \
+--prior_loss_weight=1.0 \
+--seed=42
