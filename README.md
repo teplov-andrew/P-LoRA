@@ -3,5 +3,5 @@
 
 `ImageIdit` - P-LoRA эксперименты, обучения, подсчет метрик  
 `T-LoRA` - подсчет метрик. Для обучения использовался код из [оригинального репозитория]([url](https://github.com/ControlGenAI/T-LoRA))  
-`data_train` - данные для обучения во few shot режиме
+`data_train` - данные для обучения во few shot режиме  
 `data_train_one` - данные для обучения в one shot режиме
